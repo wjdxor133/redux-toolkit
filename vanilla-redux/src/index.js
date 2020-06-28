@@ -3,8 +3,10 @@ const add = document.getElementById("add");
 const minus = document.getElementById("minus");
 const number = document.querySelector("span");
 
+number.innerText = 0;
+
 const countModifier = (count = 0, action) => {
-  console.log(count, action);
+  // console.log(count, action);
   if (action.type === "ADD") {
     return count + 1;
   } else if (action.type === "MINUS") {
@@ -19,14 +21,22 @@ const countModifier = (count = 0, action) => {
 const countStore = createStore(countModifier);
 // console.log(countStore); -> dispatch, getState, replaceReduer, subscribe 총 4가지 함수들이 존재
 
-countStore.dispatch({ type: "ADD" });
-countStore.dispatch({ type: "ADD" });
-countStore.dispatch({ type: "ADD" });
-countStore.dispatch({ type: "ADD" });
-countStore.dispatch({ type: "ADD" });
-countStore.dispatch({ type: "MINUS" });
+const onChange = () => {
+  number.innerText = countStore.getState();
+};
 
-console.log(countStore.getState());
+countStore.subscribe(onChange);
+
+const handleAdd = () => {
+  countStore.dispatch({ type: "ADD" });
+};
+
+const handleMinus = () => {
+  countStore.dispatch({ type: "MINUS" });
+};
+
+add.addEventListener("click", handleAdd);
+minus.addEventListener("click", handleMinus);
 
 /*
 store란 무엇인가?
@@ -54,4 +64,7 @@ action이란?
 message를 send하는 방법은 dispatch를 사용하면 된다.
 dispatch를 통해 내가 전송한 message는 action에 넣으면 되고, 그 다음 할일은 action을 체크하면 된다.
 그러고 return된 count값은 현재의 state를 의미한다.
+
+subscribe이란?
+- 우리에게 store 안에 있는 변화들을 알 수 있게 해준다.
 */
