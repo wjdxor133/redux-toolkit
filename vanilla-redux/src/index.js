@@ -5,15 +5,27 @@ const number = document.querySelector("span");
 
 number.innerText = 0;
 
+const ADD = "ADD";
+const MINUS = "MINUS";
+
 const countModifier = (count = 0, action) => {
   // console.log(count, action);
-  if (action.type === "ADD") {
-    return count + 1;
-  } else if (action.type === "MINUS") {
-    return count - 1;
-  } else {
-    return count;
+  switch (action.type) {
+    case ADD:
+      return count + 1;
+    case MINUS:
+      return count - 1;
+    default:
+      return count;
   }
+
+  // if (action.type === "ADD") {
+  //   return count + 1;
+  // } else if (action.type === "MINUS") {
+  //   return count - 1;
+  // } else {
+  //   return count;
+  // }
 };
 
 // createStore라는 함수가 우리에게 reducer를 주기를 요구함
@@ -28,11 +40,11 @@ const onChange = () => {
 countStore.subscribe(onChange);
 
 const handleAdd = () => {
-  countStore.dispatch({ type: "ADD" });
+  countStore.dispatch({ type: ADD });
 };
 
 const handleMinus = () => {
-  countStore.dispatch({ type: "MINUS" });
+  countStore.dispatch({ type: MINUS });
 };
 
 add.addEventListener("click", handleAdd);
@@ -67,4 +79,11 @@ dispatch를 통해 내가 전송한 message는 action에 넣으면 되고, 그 �
 
 subscribe이란?
 - 우리에게 store 안에 있는 변화들을 알 수 있게 해준다.
+- 만약 변화를 나의 store에서 감지하고 싶다면, 그 change를 구독하면 된다.
+ex)
+const onChange = () => {
+  number.innerText = countStore.getState();
+};
+
+countStore.subscribe(onChange);
 */
