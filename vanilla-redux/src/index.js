@@ -1,4 +1,96 @@
 import { createStore } from "redux";
+
+const form = document.querySelector("form");
+const input = document.querySelector("input");
+const ul = document.querySelector("ul");
+
+const ADD_TODO = "ADD_TODO";
+const DELETE_TODO = "DELETE_TODO";
+
+// 리듀서의 두번째 인자인 action에 보내지는 행동들을 객체 형태로 전송
+// 오로지 객체 형태만을 return함
+const addToDo = (text) => {
+  return { type: ADD_TODO, text };
+};
+
+const deleteToDo = (id) => {
+  return { type: DELETE_TODO, id };
+};
+
+// 절대 state 자체의 값을 변경하면 안되고, 새로운 state를 반환해야 한다.
+const reducer = (state = [], action) => {
+  switch (action.type) {
+    case ADD_TODO:
+      const newToDoObj = { text: action.text, id: Date.now() };
+      return [...state, newToDoObj];
+    // 새로운 배열을 만들어서 이전에 있던 배열의 내용에 새로운 todo 객체를 추가한다.
+    case DELETE_TODO:
+      const cleaned = state.filter((toDo) => toDo.id !== action.id);
+      return cleaned;
+    // 우리는 기존 배열의 항목을 삭제하지 않아야 한다.
+    // 삭제할 항목을 제외시키고 새로운 배열을 만들어야 한다.
+    // filter()를 통해서 삭제할 toDo의 id를 제외하고 나머지 항목을 새 배열로 반환
+    default:
+      return state;
+  }
+};
+
+const store = createStore(reducer);
+
+store.subscribe(() => console.log(store.getState()));
+
+const paintToDos = () => {
+  const toDos = store.getState();
+  ul.innerHTML = "";
+  toDos.forEach((toDo) => {
+    const li = document.createElement("li");
+    const btn = document.createElement("button");
+    btn.innerText = "DEL";
+    btn.addEventListener("click", dispatchDeleteTodo);
+    li.id = toDo.id;
+    li.innerText = toDo.text;
+    li.appendChild(btn);
+    ul.appendChild(li);
+  });
+};
+
+store.subscribe(paintToDos);
+
+// action을 dispatch하기 위해 만든 함수
+const dispatchAddToDo = (text) => {
+  store.dispatch(addToDo(text));
+};
+
+// action을 dispatch하기 위해 만든 함수
+const dispatchDeleteTodo = (e) => {
+  const id = parseInt(e.target.parentNode.id);
+  store.dispatch(deleteToDo(id));
+};
+
+// 이 함수 대신에 dispatch를 사용함
+// const createToDo = (toDo) => {
+//   const li = document.createElement("li");
+//   li.innerText = toDo;
+//   ul.appendChild(li);
+// };
+
+const onSubmit = (e) => {
+  e.preventDefault();
+  const toDo = input.value;
+  input.value = "";
+  dispatchAddToDo(toDo);
+};
+
+form.addEventListener("submit", onSubmit);
+
+/* 
+절대로 reducer의 초기 state상태가 배열이나 객체일 경우 절대로 그 state 자체를 수정해서 리턴하면 안된다.
+상태를 수정하지 않고, 새로운 것을 return 해야한다.
+예를 들어, state.push(action.text)와 같은 행위를 하면 안된다.
+*/
+
+/* 리덕스 챕터 1
+import { createStore } from "redux";
 const add = document.getElementById("add");
 const minus = document.getElementById("minus");
 const number = document.querySelector("span");
